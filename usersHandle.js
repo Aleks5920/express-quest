@@ -19,7 +19,23 @@ const getUsersById = (req, res) => {
 };
 
 const getUsers = (req, res) => {
-  database.query("select * from users").then(([users]) => {
+  let sqlusers = "select * from users";
+  const usersValues = [];
+
+  if (req.query.language != null) {
+    sqlusers += " where language = ?";
+    usersValues.push(req.query.language);
+
+    if (req.query.city != null) {
+      sqlusers += " and city = ?";
+      usersValues.push(req.query.city);
+    }
+  } else if (req.query.city != null) {
+    sqlusers += " where city = ?";
+    usersValues.push(req.query.city);
+  }
+
+  database.query(sqlusers, usersValues).then(([users]) => {
     res.status(200);
     res.json(users);
   });
